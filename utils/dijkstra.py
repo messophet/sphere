@@ -1,13 +1,13 @@
-from typing import Tuple, List
-from typing import Dict
+from typing import List
+from models.TrafficPoint import TrafficPoint
 import numpy as np
 import networkx as nx
 
 
 async def find_path_with_traffic(G: nx.MultiDiGraph,
-                           source: str,
-                           target: str,
-                           traffic_data: Dict[str, int] = None) -> Tuple[float, List[str]]:
+                                 source: str,
+                                 target: str,
+                                 traffic_data: List[TrafficPoint]):
     """
     This function will find the shortest path between source and target in the graph G.
     :param G:

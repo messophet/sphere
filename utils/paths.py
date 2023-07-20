@@ -91,7 +91,7 @@ async def update_traffic_for_user(user: User, r: redis.Redis):
     end_node = ox.nearest_nodes(G, X=[user.end_longitude], Y=[user.end_latitude])[0]
 
     # Find the new shortest path
-    cost, path = find_path_with_traffic(G, start_node, end_node, user.traffic_data)
+    cost, path = await find_path_with_traffic(G, start_node, end_node, user.traffic_data)
 
     # Convert path of node ids to longitude/latitude
     path_coordinates = [(G.nodes[node]['y'], G.nodes[node]['x']) for node in path]  # (latitude, longitude)
