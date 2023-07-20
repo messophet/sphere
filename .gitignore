@@ -1,7 +1,6 @@
 __pycache__/
 __pycache__
 *.jpeg
-*.png
 env/
 env
 .idea/
