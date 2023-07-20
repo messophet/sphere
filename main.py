@@ -31,21 +31,36 @@ def get_redis(request: Request):
 
 @app.post("/set_path")
 async def set_path(user: User, r: redis.Redis = Depends(get_redis)):
+    """
+    Sets the path for a user.
+    :param user: derived from the User model
+    :param r: redis connection injected by "Depends"
+    :return: path coordinates
+    :error: error message
+    """
     try:
         logger.info("Called set_path for %s", user.userid)
 
-        path_coordinates = set_path_for_user(user, r)
+        path_coordinates = await set_path_for_user(user, r)
         logger.info("Successfully set path for user %s", user.userid)
 
         return {"path": path_coordinates}
     except Exception as e:
-        error = "Error setting path for user %s: %s", user.userid, e
+        # I know this is generic but in the interest of time I'm going to forego making it more specific
+        error = "Error setting path for user {}: {}".format(user.userid, e)
         logger.error(error)
         return {"error": error}
 
 
 @app.post("/update_traffic")
 async def update_traffic(user: User, r: redis.Redis = Depends(get_redis)):
+    """
+    Updates the traffic data for a user.
+    :param user: derived from the User model
+    :param r: redis connection injected by "Depends"
+    :return: updated path coordinates
+    :error: error message
+    """
     try:
         logger.info("Called update_traffic for %s", user.userid)
 
@@ -54,13 +69,19 @@ async def update_traffic(user: User, r: redis.Redis = Depends(get_redis)):
 
         return {"path": path_coordinates}
     except Exception as e:
-        error = "Error updating path for user %s: %s", user.userid, e
+        error = "Error updating path for user {}: {}".format(user.userid, e)
         logger.error(error)
         return {"error": error}
 
 
 @app.websocket("/ws/{client_id}")
 async def updates(websocket: WebSocket):
+    """
+    Websocket endpoint for updating the traffic data for a user.
+    :param websocket: websocket connection
+    :return: streams data to the client
+    :exception: WebSocketDisconnect
+    """
     await manager.connect(websocket)
     try:
         # Just keep the connection open.

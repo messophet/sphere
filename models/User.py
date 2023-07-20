@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 from models.TrafficPoint import TrafficPoint
 
 
@@ -9,4 +9,4 @@ class User(BaseModel):
     longitude: float
     end_latitude: float
     end_longitude: float
-    traffic_data: List[TrafficPoint] = None
+    traffic_data: Optional[List[TrafficPoint]] = None

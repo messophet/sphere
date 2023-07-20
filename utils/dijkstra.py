@@ -4,7 +4,7 @@ import numpy as np
 import networkx as nx
 
 
-def find_path_with_traffic(G: nx.MultiDiGraph,
+async def find_path_with_traffic(G: nx.MultiDiGraph,
                            source: str,
                            target: str,
                            traffic_data: Dict[str, int] = None) -> Tuple[float, List[str]]:
@@ -19,8 +19,8 @@ def find_path_with_traffic(G: nx.MultiDiGraph,
     Each edge in the OSMnx graph represents a street segment and has a unique ID.
     Example of traffic data:
         traffic_data = {
-            ("316226685", "53015629", 0): 5,  # Add 5 units of time to the edge from node 316226685 to node 53015629
-            ("53015629", "316226685", 0): 10,  # Add 10 units of time to the edge from node 53015629 to node 316226685
+            latitude=51.5074, longitude=-0.1278, delay=10,  # Add 10 units of time (minutes) to the edge
+                                                              derived from the latitude and longitude
             # More traffic data...
         }
     """

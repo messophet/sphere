@@ -11,6 +11,12 @@ import networkx as nx
 
 
 async def set_path_for_user(user: User, r: redis.Redis):
+    """
+    Sets the path for a user. Caches into redis. Returns the path coordinates as a list of longitudes and latitudes.
+    :param user: derived from the User model
+    :param r: redis connection
+    :return: path coordinates
+    """
     logger.info("Setting path for user %s", user.userid)
 
     # Get the user's current location and destination
@@ -38,10 +44,14 @@ async def set_path_for_user(user: User, r: redis.Redis):
     logger.info("Found start node %s and end node %s for user %s", start_node, end_node, user.userid)
 
     # Apply traffic data
-    apply_traffic_data(G, user.traffic_data)
+    if user.traffic_data:
+        logger.info("Applying traffic data for user %s", user.userid)
+        apply_traffic_data(G, user.traffic_data)
+
 
     # Find the shortest path
-    cost, path = find_path_with_traffic(G, start_node, end_node, user.traffic_data)
+    cost, path = await find_path_with_traffic(G, start_node, end_node, user.traffic_data)
+
 
     # Serialize the path and store it in Redis
     r.set(f"path_{user.userid}", pickle.dumps(path))
@@ -53,6 +63,12 @@ async def set_path_for_user(user: User, r: redis.Redis):
 
 
 async def update_traffic_for_user(user: User, r: redis.Redis):
+    """
+    Updates the traffic data for a user. Updates the path in Redis.
+    :param user: derived from the User model
+    :param r: redis connection
+    :return: updated path coordinates, and streams updates to the user's websocket
+    """
     logger.info("Received traffic update for user %s", user.userid)
 
     # Check if the graph exists in Redis
@@ -63,7 +79,9 @@ async def update_traffic_for_user(user: User, r: redis.Redis):
     G = pickle.loads(r.get(f"graph_{user.userid}"))
 
     # Apply traffic data
-    apply_traffic_data(G, user.traffic_data)
+    if user.traffic_data:
+        logger.info("Applying traffic data for user %s", user.userid)
+        apply_traffic_data(G, user.traffic_data)
 
     # Serialize and store the updated graph back in Redis
     r.set(f"graph_{user.userid}", pickle.dumps(G))
@@ -86,6 +104,12 @@ async def update_traffic_for_user(user: User, r: redis.Redis):
 
 
 def apply_traffic_data(G: nx.DiGraph, traffic_data: List[TrafficPoint]):
+    """
+    Applies traffic data to the graph.
+    :param G: graph of route
+    :param traffic_data: traffic data for relevant points along the route
+    :return: nothing, updates the graph in place
+    """
     # For each pair of consecutive points, find the nearest nodes and create an edge with the delay as the weight
     for i in range(len(traffic_data) - 1):
         point1 = traffic_data[i]

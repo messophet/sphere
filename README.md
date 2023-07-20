@@ -1,7 +1,16 @@
+
+
 ### Usage:
 (Tested using python 3.11.4 and MacOS 13.4 [M1 Max MBP w/ 1TB SSD & 32GB RAM])
 - Run: `docker-compose up --build` OR (if built) `docker-compose up`
 - Run tests: `(from main dir: python -m unittest discover` OR `docker-compose up test)`
+
+Example Response from set_path:
+![Input](input.png)
+
+Illustrated:
+![Map](map.png)
+
 ---
 ### To do (make production-ready):
 - k8s yaml for load-balancing deployment
